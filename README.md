@@ -1,4 +1,3 @@
-
 # Travel Agency Data Platform
 
 ## Problem Statement
@@ -13,39 +12,52 @@ The system is designed to efficiently process and store data while ensuring scal
 ![Architecture Diagram](https://github.com/blessingokeke101/travel_agency/blob/main/data_architecture.jpg)
 
 ### Components:
-1. **Data Ingestion:**
+1. *Data Ingestion:*
    - Extracts raw data from the [REST Countries API](https://restcountries.com/v3.1/all).
    - Stores the raw data in AWS S3 as Parquet files to serve as the Data Lake.
 
-2. **Data Transformation:**
+2. *Data Transformation:*
    - Apache Airflow orchestrates workflows to extract and transform specific attributes from the raw data.
 
-3. **Data Storage:**
+3. *Data Storage:*
    - Stores the final transformed data in a database in Snowflake, enabling efficient querying and analytics.
 
-4. **Infrastructure as Code:**
+4. *Infrastructure as Code:*
    - Terraform provisions all required cloud infrastructure.
 
-5. **CI/CD Pipeline:**
+5. *CI/CD Pipeline:*
    - GitHub Actions automates linting, testing, and deployment of Dockerized workflows to AWS ECR.
 
-6. **Data Modeling:**
+6. *Data Modeling:*
    - DBT organizes data into fact and dimension tables for predictive analytics.
 
+---
+
+## Data Description
+
+The data is organized into the following tables:
+
+- *dimCountry*: Stores country details such as country name, country code, official name, population, and language information.
+- *dimLocation*: Contains geographic details like region, subregion, and continent information.
+- *dimCurrency*: Stores currency details like currency name, code, and symbol.
+- *factTable*: The fact table contains key metrics, including country population, area, region, and currency information, linked to the dimCountry, dimLocation, and dimCurrency tables.
+
+### Entity Relationship Diagram (ERD)
+![ERD Diagram](https://github.com/blessingokeke101/travel_agency/blob/main/erd_travel_agency.png)
 
 ---
 
 ## Directions to Run the Code/Project
 
 ### Prerequisites
-- **Required Tools:**
+- *Required Tools:*
   - Docker
   - Terraform
   - AWS CLI
   - DBT
   - Apache Airflow
-  - Python with dependencies in `requirements.txt` and `requirements-ci.txt`
-- **Accounts/Access:**
+  - Python with dependencies in airflow\requirements.txt, requirements.txt, and requirements-ci.txt
+- *Accounts/Access:*
   - AWS Account (S3, ECR, Snowflake permissions).
   - GitHub repository: [Travel Agency Data Platform](https://github.com/blessingokeke101/travel_agency).
 
@@ -53,67 +65,64 @@ The system is designed to efficiently process and store data while ensuring scal
 
 ### Steps to Run
 
-1. **Clone the Repository:**
-   ```bash
+1. *Clone the Repository:*
+   bash
    git clone https://github.com/blessingokeke101/travel_agency.git
    cd travel_agency
-   ```
+   
 
-2. **Set Up Infrastructure:**
+2. *Set Up Infrastructure:*
    - Navigate to the Terraform directory:
-     ```bash
+     bash
      cd terraform
      terraform init
      terraform apply
-     ```
+     
    - Verify all resources (S3 bucket, Snowflake, IAM roles) are provisioned.
 
-3. **Build and Push Docker Image:**
+3. *Build and Push Docker Image:*
    - Build the Docker image:
-     ```bash
+     bash
      docker build -t travel-agency-extractor .
-     ```
+     
    - Push the image to AWS ECR:
-     ```bash
+     bash
      aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <ecr_url>
      docker tag travel-agency-extractor:latest <ecr_url>/travel-agency-extractor:latest
      docker push <ecr_url>/travel-agency-extractor:latest
-     ```
+     
 
-4. **Run Apache Airflow:**
+4. *Run Apache Airflow:*
    - Start Airflow to orchestrate the workflows:
-     ```bash
+     bash
      cd airflow
      docker-compose up
-     ```
+     
    - Monitor and trigger workflows through the Airflow web UI.
 
-5. **Run DBT Models:**
+5. *Run DBT Models:*
    - Navigate to the DBT project directory:
-     ```bash
+     bash
      cd dbt_project
      dbt run
-     ```
+     
    - Verify that fact and dimension tables are created in Snowflake.
 
-6. **CI/CD with GitHub Actions:**
+6. *CI/CD with GitHub Actions:*
    - GitHub Actions are pre-configured for code linting, testing, and Docker image deployment.
    - Push any changes to the repository to trigger the CI/CD pipeline:
-     ```bash
+     bash
      git add .
      git commit -m "Your commit message"
      git push origin main
-     ```
+     
 
-7. **Validate the Pipeline:**
+7. *Validate the Pipeline:*
    - Verify raw data and transformed data is stored in S3, the database is in Snowflake, and workflows are orchestrated in Airflow.
 
 ---
 
 ## Repository Links
-- **Repository URL:** [Travel Agency Data Platform Repository](https://github.com/blessingokeke101/travel_agency)
-- **Clone URL:** `https://github.com/blessingokeke101/travel_agency.git`
-- **Data API:** [REST Countries API](https://restcountries.com/v3.1/all)
-
----
-
+- *Repository URL:* [Travel Agency Data Platform Repository](https://github.com/blessingokeke101/travel_agency)
+- *Clone URL:* https://github.com/blessingokeke101/travel_agency.git
+- *Data API:* [REST Countries API](https://restcountries.com/v3.1/all)
