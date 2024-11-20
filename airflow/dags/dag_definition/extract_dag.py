@@ -45,7 +45,7 @@ copy_into_table = CopyFromExternalStageToSnowflakeOperator(
     table="TRAVELS",
     stage="TRAVEL_AGENCY_STAGING_TABLE",
     file_format="PARQUET_FILE_FORMAT",
-    database="TRAVEL-AGENCY",
+    database="TRAVEL_AGENCY",
     schema="DBOO"
 )
 
