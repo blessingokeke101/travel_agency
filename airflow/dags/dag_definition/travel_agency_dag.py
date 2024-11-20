@@ -1,12 +1,11 @@
 import datetime
 
-from airflow import DAG
 from airflow.operators.python import PythonOperator
-from utils.extract_s3 import extract_to_s3, retrieve_data
-from utils.extract_data import extract_data
-from airflow.providers.snowflake.transfers.copy_into_snowflake import CopyFromExternalStageToSnowflakeOperator
-from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
+from airflow.providers.snowflake.transfers.copy_into_snowflake import \
+    CopyFromExternalStageToSnowflakeOperator
+from utils.s3_functions import s3_extract_transform_load, write_to_s3
 
+from airflow import DAG
 
 DAG_ID = 'a_travel_agency'
 
@@ -27,20 +26,20 @@ dag = DAG(
     default_view="graph"
 )
 
-extract_profile_to_s3 = PythonOperator(
+api_data_ingestion_to_s3 = PythonOperator(
     dag=dag,
-    task_id='cde_travel_agency',
-    python_callable=extract_to_s3
+    task_id='api_data_ingestion_to_s3',
+    python_callable=write_to_s3
 )
 
-retrieve_data_from_s3 = PythonOperator(
+s3_extract_transform_load_ = PythonOperator(
     dag=dag,
-    task_id='cde_travel',
-    python_callable=retrieve_data
+    task_id='s3_extract_transform_load_task',
+    python_callable=s3_extract_transform_load
 )
 
 copy_into_table = CopyFromExternalStageToSnowflakeOperator(
-    task_id="copy_into_table",
+    task_id="s3_to_snowflake",
     snowflake_conn_id="snowflake-connection",
     table="TRAVELS",
     stage="TRAVEL_AGENCY_STAGING_TABLE",
@@ -49,4 +48,4 @@ copy_into_table = CopyFromExternalStageToSnowflakeOperator(
     schema="DBOO"
 )
 
-extract_profile_to_s3 >> retrieve_data_from_s3 >> copy_into_table
+api_data_ingestion_to_s3 >> s3_extract_transform_load_ >> copy_into_table

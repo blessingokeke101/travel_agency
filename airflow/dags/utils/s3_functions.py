@@ -1,14 +1,15 @@
+import logging
+
+import awswrangler as wr
 import boto3
 from airflow.models import Variable
-from .extract_data import extract_data
-import awswrangler as wr
-import pandas as pd
-from .travel_trans import transform_data
-import logging
-# Establish connection with AWS and Extract files to AWS S3
+
+from .data_extraction import extract_api_data
+from .data_transformation import transform_data
 
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(name)s:%(message)s')
 logging.getLogger().setLevel(20)
+
 
 def aws_session():
     session = boto3.Session(
@@ -18,8 +19,9 @@ def aws_session():
     )
     return session
 
-def extract_to_s3():
-    data = extract_data()
+
+def write_to_s3():
+    data = extract_api_data()
     wr.s3.to_parquet(
         df=data,
         path="s3://dev-cde-travel-agency/raw-data",
@@ -30,9 +32,10 @@ def extract_to_s3():
     return ("Data successfully written to the all all_profiles S3 bucket")
 
 
-def retrieve_data():
-    col=['name','independent', 'continents', 'unMember', 'startOfWeek','region', 'subregion',
-            'population', 'area', 'currencies','languages', 'idd', 'capital']
+def s3_extract_transform_load():
+    col = ['name', 'independent', 'continents', 'unMember', 'startOfWeek',
+           'region', 'subregion', 'population', 'area', 'currencies',
+           'languages', 'idd', 'capital']
     logging.info("fetching parquet file")
     df = wr.s3.read_parquet(
         path="s3://dev-cde-travel-agency/raw-data",
@@ -41,15 +44,14 @@ def retrieve_data():
         dataset=True
     )
     logging.info("finish reading parquet file")
-    df = pd.DataFrame(df)
-    logging.info("finished conversion to pandas dataframe")
     data = transform_data(df)
-    logging.info("transforming data")
+    logging.info("finished transforming data")
     if data is not None:
-        extract_transformed_to_s3(data)
+        write_transformed_data_to_s3(data)
+        logging.info("transformed data written to s3")
 
 
-def extract_transformed_to_s3(data):
+def write_transformed_data_to_s3(data):
     wr.s3.to_parquet(
         df=data,
         path="s3://dev-cde-travel-agency/transformed-data",
@@ -57,5 +59,4 @@ def extract_transformed_to_s3(data):
         mode='overwrite',
         dataset=True
     )
-    return ("Transformed data successfully written to the all all_profiles S3 bucket")
-
+    return ("Transformed data successfully written to the S3 bucket")
