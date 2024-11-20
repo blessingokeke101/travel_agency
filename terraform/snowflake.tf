@@ -1,5 +1,5 @@
 resource "snowflake_database" "travel_agency_database" {
-  name="TRAVEL-AGENCY"
+  name="TRAVEL_AGENCY"
   drop_public_schema_on_creation=true
 }
 
