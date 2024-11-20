@@ -38,10 +38,10 @@ The system is designed to efficiently process and store data while ensuring scal
 
 The data is organized into the following tables:
 
-- *dimCountry*: Stores country details such as country name, country code, official name, population, and language information.
-- *dimLocation*: Contains geographic details like region, subregion, and continent information.
-- ⁠*dimCurrency*: Stores currency details like currency name, code, and symbol.
-- ⁠*factTable*: The fact table contains key metrics, including country population, area, region, and currency information, linked to the ⁠ dimCountry ⁠, ⁠ dimLocation ⁠, and ⁠ dimCurrency ⁠ tables.
+- **dimCountry**: Stores country details such as country name, country code, official name, population, and language information.
+- **dimLocation**: Contains geographic details like region, subregion, and continent information.
+- ⁠**dimCurrency**: Stores currency details like currency name, code, and symbol.
+- ⁠**factTable**: The fact table contains key metrics, including country population, area, region, and currency information, linked to the ⁠ dimCountry ⁠, ⁠ dimLocation ⁠, and ⁠ dimCurrency ⁠ tables.
 
 ### Entity Relationship Diagram (ERD)
 ![ERD Diagram](https://github.com/blessingokeke101/travel_agency/blob/main/erd_travel_agency.png)
